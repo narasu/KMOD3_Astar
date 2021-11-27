@@ -14,15 +14,14 @@ public class Astar
     /// <param name="endPos"></param>
     /// <param name="grid"></param>
     /// <returns></returns>
-    enum Direction { N, E, S, W, NE, SE, NW, SW }
     
     List<Node> openNodes = new List<Node>();
     List<Vector2Int> closedNodes = new List<Vector2Int>();
-    int maxOperations = 10000;
+    int maxOperations = 10000; 
+
     public List<Vector2Int> FindPathToTarget(Vector2Int startPos, Vector2Int endPos, Cell[,] grid)
     {
         Stack<Vector2Int> path = new Stack<Vector2Int>();
-        Node parent = null;
         float HScore = Vector2Int.Distance(startPos, endPos);
         Node startNode = new Node(startPos, null, 0f, HScore);
         Node current = startNode;
@@ -32,14 +31,19 @@ public class Astar
 
         while (openNodes.Count > 0)
         {
+            //prevent infinite loops. Credits to Wridzer
             if (numOperations >= maxOperations)
             {
                 Debug.LogError("Too many operations");
                 openNodes.Clear();
                 return null;
             }
+
+
             current = GetNodeWithLowestFScore();
             
+            /* If the target is reached, push all visited nodes onto a stack.
+             * The stack is then reversed into a list which we will return */
             if (current.position == endPos)
             {
                 while (current.parent != null)
@@ -47,16 +51,16 @@ public class Astar
                     path.Push(current.position);
                     current = current.parent;
                 }
-                //path.Push(current.position);
-
                 openNodes.Clear();
                 closedNodes.Clear();
                 return path.ToList();
             }
+
+            //Keep track of visited nodes
             openNodes.Remove(current);
             closedNodes.Add(current.position);
-            parent = current;
-            
+
+            // Generate the next nodes and add them to openNodes if they are valid
             List<Node> adjacentNodes = GenerateAdjacentNodes(current, grid);
             foreach (Node n in adjacentNodes)
             {
@@ -77,12 +81,11 @@ public class Astar
                 }
             }
 
-            Debug.Log(openNodes.Count);
             numOperations++;
         }
         openNodes.Clear();
         closedNodes.Clear();
-        Debug.Log("no good");
+        Debug.Log("Invalid path!");
         return null;
     }
 
