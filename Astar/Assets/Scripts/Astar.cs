@@ -43,7 +43,7 @@ public class Astar
             current = GetNodeWithLowestFScore();
             
             /* If the target is reached, push all visited nodes onto a stack.
-             * The stack is then reversed into a list which we will return */
+             * The stack is then popped into a list which we will return */
             if (current.position == endPos)
             {
                 while (current.parent != null)
